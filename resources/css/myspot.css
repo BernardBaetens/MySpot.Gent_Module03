@@ -1,0 +1,383 @@
+/* General Styling */
+* {
+  text-shadow: 0 0 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: Raleway, Arial, serif;
+}
+body.h1 {
+  font-family: Text Me One, Helvetica, sans-serif;
+  font-weight: bold;
+}
+.horizontalLine{
+  border: 0;
+  clear:both;
+  background-color: #ff7f00;
+  height: 1px;
+}
+#prHorizontalLine{
+  border: 0;
+  clear:both;
+  background-color: rgba(0, 170, 255, 0.9);
+  height: 2px;
+}
+#garageHorizontalLine{
+  border: 0;
+  clear:both;
+  background-color: rgba(190, 0, 255, 0.7);
+  height: 2px;
+}
+/* Otherwise map is streched */
+#page1, #page1 .ui-content {
+   width: 100%;
+   height: calc(100% - 4.9em);
+}
+
+/* MAP */
+#mapContainer{
+    height: 100%;
+}
+#map{
+   height: 100%;
+   background-color: #fff8f0;
+}
+/* Headers and footers */
+.mainHeader{
+  height: 3em;
+  top: 0;
+}
+.mainFooter{
+  height: 1.5em;
+  bottom: 0;
+}
+#mainHeaderText1, #mainHeaderText2, #mainHeaderText3{
+  font: bold 1.3em "Text Me One", Helvetica, sans-serif;
+  /* font-weight: bold;*/
+  letter-spacing: 0.1em;
+  color: #ff7f00;
+  position: relative;
+  top: 0.45em;
+  padding: 0;
+  margin: 0;
+  vertical-align: middle;
+}
+#mainFooterText{
+  font:0.9em "Text Me One", Helvetica, sans-serif;
+  color: #ff7f00;
+  letter-spacing: 0.1em;
+  padding: 0;
+  margin:0;
+  position: relative;
+  bottom: -0.15em;
+}
+.btn-header{
+  position: absolute;
+  top: 0.45em;
+  font: 0.6em "Raleway", Arial, serif;
+}
+/* Panels*/
+#routingPanel,#layerPanel{
+  background-color: #454545;
+}
+#routingPanel{
+  border-right: solid;
+  border-right-color: #ff7f00;
+  border-right-width: 1px;
+}
+#layerPanel{
+  border-left: solid;
+  border-left-color: #ff7f00;
+  border-left-width: 1px;
+}
+.ui-panel-inner {
+  padding: 0;
+}
+.ui-field-contain{
+  margin: 0;
+  padding: 0;
+}
+.info{
+  float:right;
+  position: relative;
+  bottom: -5px;
+}
+.routingLabel{
+  height: 8px;
+  width: 18px;
+  position: relative;
+  left: 6px;
+}
+.lyrImage{
+  height: 18px;
+  width: 18px;
+  position: relative;
+  bottom: -3px;
+  left: 6px;
+}
+/*back button position */
+#btn-back1, #btn-back2{
+  position: absolute;
+  top: 0.55em;
+}
+/* Form Styling */
+.ui-content{
+  margin: -18px 0 -18px -20px;
+}
+/* Navigation Button */
+#btnNavigationDiv{
+  margin: 10px 35% 10px 35%;
+  padding: 0 7px;
+  border: solid 1px #ff7f00;
+}
+#btnNavigation{
+  padding: 0;
+  min-width: 75px;
+}
+#btnNavigationText{
+  margin: 0;
+}
+/* Create overflow within panels */
+.ui-panel .ui-panel-inner {
+  position:absolute;
+  top: 0;
+  left: 0;
+  right:0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+/* From  and To styling */
+#formInput{
+  font-size: small;
+}
+.inputTextContainer{
+  display: inline-block;
+  float: left;
+  padding: 0;
+  margin: 0;
+  width: 67%;
+}
+.inputButtons{
+  display: inline-block;
+  float: right;
+  width: 31%;
+  padding: 0;
+  margin: 27px 0 0 0;
+}
+.btnMapLocation{
+  margin: auto;
+  height: 6px;
+  vertical-align: middle;
+}
+.btnCurrentLocation{
+  margin: auto;
+  height: 6px;
+  vertical-align: middle;
+}
+.btnLocation{
+  display: inline-block;
+  float: left;
+  outline: 0 none;
+  padding: 0;
+  margin: 0;
+  width: 47%;
+}
+.locationBtn{
+  position: relative;
+  bottom: 6px;
+  text-align: center;
+}
+.btnCurrent{
+  display: inline-block;
+  float: right;
+  outline: 0 none;
+  padding: 0;
+  margin: 0;
+  width: 51%;
+}
+/* DatePicker*/
+#dateContainer {
+  margin: 10px 3px 10px 0;
+}
+/*Duration */
+#durationContainer{
+  margin: 0 3px 0 0;
+}
+/* post transport */
+#postTransportContainer{
+  margin: 20px 0 10px 0;
+}
+/* Buttons */
+#submitResetContainer{
+  margin: 6px 8% 7px 8%;
+}
+#btnRouteContainer{
+  float: left;
+}
+#btnResetContainer{
+  float: right;
+}
+/* Routing Information */
+.ui-grid-d{
+  margin: 0 0 0 10px;
+}
+.routingInfoSeperator{
+  background-color: #454545;
+}
+.wrapListItem{
+  white-space: normal !important;
+  vertical-align: middle;
+}
+.routingImage{
+  height: 35px;
+  width: 35px;
+}
+.routingImageBike{
+  height: 35px;
+  width: 35px;
+  position: absolute;
+  left: 60%;
+  bottom: 44px;
+}
+.routingImageBus{
+  height: 35px;
+  width: 35px;
+  position: absolute;
+  left: 60%;
+  bottom: 42px;
+}
+.routingImageWalk{
+  height: 30px;
+  width: 30px;
+  position: absolute;
+  left: 61%;
+  bottom: 45px;
+}
+#prDurationPostTransport{
+  position: absolute;
+  bottom: 10px;
+}
+#garageDurationPostTransport{
+  position: absolute;
+  bottom: 11px;
+}
+.totalDuration{
+  position: absolute;
+  bottom: 11px;
+}
+.routingInfoParkingIcon{
+  position: absolute;
+  bottom: 40px;
+  left: 44%;
+}
+#routingInfoParkingIconGarage{
+  position: absolute;
+  left: 42%;
+  bottom: 43px;
+}
+#routingInfoParkingIconPr{
+  position: absolute;
+  left: 42%;
+  bottom: 43px;
+}
+/*Public transport info */
+.ptListDivider{
+  vertical-align: middle;
+  height: 0.6em;
+}
+.ptListDividerText{
+  font: 1em "Text Me One", Helvetica, sans-serif;
+  position : relative;
+  bottom: 4px;
+}
+.ptListDividerTextLeft{
+  font: 1em "Text Me One", Helvetica, sans-serif;
+  position : relative;
+  bottom: 21px;
+  text-align: right;
+}
+/* Mouse pointer on autocomplete */
+.autocomplete{
+  cursor: pointer;
+}
+
+/* Media queries */
+/* Smartphones */
+@media screen and (min-width: 320px) {
+  #layerPanel {
+    width: 60%;
+  }
+  #routingPanel {
+    width: 100%;
+  }
+}
+/* Tablets */
+@media screen and (min-width: 700px) {
+  #layerPanel {
+    width: 30%;
+  }
+  #routingPanel {
+    width: 50%;
+  }
+}
+/* Desktops */
+@media screen and (min-width: 1100px) {
+  #layerPanel {
+    width: 15em;
+  }
+  #routingPanel {
+    width: 30em;
+  }
+}
+
+/* OpenLayers Pop-up Styling */
+.ol-popup {
+  position: absolute;
+  background-color: white;
+  -webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2));
+  padding: 15px;
+  border: 1px solid #cccccc;
+  bottom: 12px;
+  left: -50px;
+  min-width: 280px;
+  font-size: small;
+  color: black;
+
+}
+.ol-popup:after, .ol-popup:before {
+  top: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.ol-popup:after {
+  border-top-color: white;
+  border-width: 10px;
+  left: 48px;
+  margin-left: -10px;
+}
+.ol-popup:before {
+  border-top-color: #cccccc;
+  border-width: 11px;
+  left: 48px;
+  margin-left: -11px;
+}
+.ol-popup-closer {
+  text-decoration: none;
+  position: absolute;
+  top: 0;
+  right: 4px;
+}
+.ol-popup-closer:after {
+  content: "✖";
+}
+.popUpHeader{
+  font: bold 1.2em "Text Me One", Helvetica, sans-serif;
+  text-align: center;
+  border: solid 1px #ff7f00;
+}
