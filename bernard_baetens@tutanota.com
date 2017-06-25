@@ -26,12 +26,16 @@
 
   <!-- main map -->
   <div id="mapContainer">
-    <div id="map" class="map"></div>
+    <div id="map" class="map">
+    </div>
     <div id="popup" class="ol-popup">
       <a href="#" id="popup-closer" class="ol-popup-closer"></a>
       <div id="popup-content"></div>
     </div>
-  </div>      
+    <div id="rafaMapContainer">
+      <a href="https://github.com/BernardBaetens/MySpot.Gent_Module03" target="_blank"><img src="resources/css/images/myspot_icons/RafaReversed.png" id="rafaMap"></a>
+    </div>
+  </div>
 
   <!-- left panel ROUTING -->
   <div data-role="panel" data-position="left" id="routingPanel" data-display="overlay" data-theme="c" data-dismissible="false" data-swipe-close="false">
@@ -147,7 +151,7 @@
     <div data-role="collapsible" class="routingInfoCollapsible ui-disabled" data-theme="b" data-collapsed="true" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" id="routingInfoCollapseHeader" >
       <h1>ROUTING INFO</h1>
       <!-- P+R Information -->
-      <div class="ui-collaspible-set">
+      <div class="ui-collaspible-set routingInfoMain">
         <div data-role="collapsible" class="InfoCollapsible animateMe" data-theme="b" data-collapsed="true" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-mini="true" >
           <h2 class="'nestedColaps">Park + Ride</h2>
           <ul data-role="listview" data-inset="false" class="routingInfoList1" id="prInfoCollapsible">
@@ -239,7 +243,7 @@
         </div>
       </div>
       <!-- Parking Garage Information -->
-      <div class="ui-collaspible-set">
+      <div class="ui-collaspible-set routingInfoMain">
         <div data-role="collapsible" class="InfoCollapsible animateMe" data-theme="b" data-collapsed="true" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-mini="true">
           <h2 class="'nestedColaps">Parking Garage</h2>
           <ul data-role="listview" data-inset="false" class="routingInfoList1"> <!-- Parking Info -->
@@ -291,7 +295,6 @@
                   </div>
                   <div class="ui-block-b">
                     <p class="wrapListItem" id="garageDistanceCar"> <!-- Distance Car -->
-                      53 km
                     </p>
                     <p class="wrapListItem">
                       <img src="resources/css/images/myspot_icons/car.svg" class="routingImage"> <!-- Car Image -->
@@ -395,6 +398,26 @@
       </div>
     </div>
     <div class="ui-collaspible-set">
+      <div data-role="collapsible" class="layerType animateMe" data-theme="b" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
+        <h1>PUBLIC TRANSPORT</h1>
+        <div class="ui-field-contain">
+          <label for="ptStops"><img src="resources/css/images/myspot_icons/bus-stop.svg" class="lyrImage">
+            &emsp;Stops</label>
+          <input type="checkbox" name="pt" id="ptStops" value="ptStops" data-mini="true">
+        </div>
+        <div class="ui-field-contain">
+          <label for="ptLinesAll"><img src="resources/css/images/myspot_icons/ptAll.png" class="routingLabel">
+            &emsp;All Lines</label>
+          <input type="checkbox" name="pt" id="ptLinesAll" value="ptLinesAll" data-mini="true">
+        </div>
+        <div class="ui-field-contain" id="ptLinesSingle">
+          <select name="ptSingle" id="ptSingle" data-mini="true">
+            <option value="empty" class="ptSingleList">No single line</option>'
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="ui-collaspible-set">
       <div data-role="collapsible" class="layerType animateMe initExpand" data-theme="b" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
         <h1>ZONES</h1>
         <fieldset data-role="controlgroup">
@@ -434,6 +457,9 @@
     <h1 id="mainFooterText">Geo-ICT Module 3</h1>
   </div> <!-- end footer -->
 </div> <!-- end page 1 -->
+<!-- Loading page at startup -->
+<div id="loading"></div>
+
 <!-- Scripts -->
 <script src="https://openlayers.org/en/v4.1.1/build/ol.js" type="text/javascript"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.4.3/proj4-src.js" type="text/javascript"></script>
@@ -442,6 +468,7 @@
         integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
         crossorigin="anonymous"></script>
 <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<script src="resources/js/jquery.loader.js"></script>
 <script src="https://use.fontawesome.com/d0a5636f45.js"></script>
 <script src="http://cdn.jtsage.com/jtsage-datebox/4.1.1/jtsage-datebox-4.1.1.jqm.min.js" type="text/javascript"></script>
 <script src="resources/js/myspot.js"></script>
