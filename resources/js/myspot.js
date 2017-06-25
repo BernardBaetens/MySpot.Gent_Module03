@@ -3,29 +3,32 @@
  */
 $("#duration").val("4");
 $('.publicTransportMainDiv').hide();
-
-/* Page Loader */
-$(document).on('pagebeforecreate', '[data-role="page"]', function(){
-    var interval = setInterval(function(){
-        $.mobile.loading('show');
-        clearInterval(interval);
-    },1);
+//////////////////
+/* Loading Page */
+function onReady(callback) {
+    var intervalID = window.setInterval(checkReady, 1000);
+    function checkReady() {
+        if (document.getElementsByTagName('body')[0] !== undefined) {
+            window.clearInterval(intervalID);
+            callback.call(this);
+        }
+    }
+}
+function show(id, value) {
+    document.getElementById(id).style.display = value ? 'block' : 'none';
+}
+onReady(function () {
+    show('page1', true);
+    mapFunction();
+    show('loading', false);
 });
-
-$(document).on('pageshow', '[data-role="page"]', function(){
-    var interval = setInterval(function(){
-        $.mobile.loading('hide');
-        clearInterval(interval);
-    },100);
-});
-
+//////////////////
 /* Panel behaviour per width */
 $(document).on('pagebeforeshow', '#page1', function(){
     if (window.innerWidth > 1100) {
         $("#routingPanel").panel("open");
     }
 });
-
 window.onresize = function (event) {
     if (window.innerWidth > 1100) {
         window.setTimeout(openPanel, 1);
@@ -34,13 +37,26 @@ window.onresize = function (event) {
         window.setTimeout(closePanel, 1);
     }
 };
-
 function closePanel() {
     $("#routingPanel").panel("close");
 }
 function openPanel() {
     $("#routingPanel").panel("open");
 }
+//////////////////
+// create list for PT Single
+var ptSingleList =
+    ['1','3','4','5','6','8','9','14','15','16','17','18','20','21','22','27','28','28S','29','34','35','36',
+        '37','38','39','41','42','43','44','45','46','47','48','49','52','53','54','55','55S','56','57','58','59',
+        '62','63','64','65','66','67','68','69','70','71','72','73','74','75','76','77','78','81','82','83','84',
+        '85','86','87','91','92','93','94','96','97','98','58S','N1','N17','N21','N3','N4','N5','N70','N76'];
+$(document).ready(function createPtList(){
+    for (i = 0; i < ptSingleList.length; i++){
+        $('#ptSingle').append('<option value="' + ptSingleList[i] + '" class="ptSingleList">' + '&nbsp;Line: ' + ptSingleList[i] + '</option>');
+    }
+    $('#ptSingle').selectmenu('refresh');
+});
+//////////////////
 /* Animate collapsible */
 $(document).on("pagecreate", "#page1", function(){
     $(".animateMe .ui-collapsible-heading-toggle").on("click", function (e) {
@@ -53,13 +69,11 @@ $(document).on("pagecreate", "#page1", function(){
         }
     });
 });
-
 $(document).on( "pagecontainerbeforeshow", function( event, ui ) {
     $(".initExpand .ui-collapsible-heading-toggle").click().removeClass("initExpand");
 });
-
+//////////////////
 /* Autocomplete */
-// change to an on-change event
 $( document ).on( "pagecreate", "#page1", function() {
 
     $( "#autocompleteFrom" ).on( "filterablebeforefilter", function ( e, data ) {
@@ -82,7 +96,6 @@ $( document ).on( "pagecreate", "#page1", function() {
                     $.each( response, function ( i, val ) {
                         document.getElementById('autocompleteFrom').innerHTML = "";
                         for(i in response.SuggestionResult){
-                            //console.log(response.SuggestionResult[i]);
                             var list_item = document.createElement("li");
                             list_item.setAttribute("class", "ui-li-static ui-body-inherit");
                             list_item.innerHTML = response.SuggestionResult[i];
@@ -113,7 +126,6 @@ $( document ).on( "pagecreate", "#page1", function() {
                     $.each( response, function ( i, val ) {
                         document.getElementById('autocompleteTo').innerHTML = "";
                         for(i in response.SuggestionResult){
-                            //console.log(response.SuggestionResult[i]);
                             var list_item = document.createElement("li");
                             list_item.setAttribute("class", "ui-li-static ui-body-inherit");
                             list_item.innerHTML = response.SuggestionResult[i];
@@ -123,11 +135,11 @@ $( document ).on( "pagecreate", "#page1", function() {
                 });
         }
     });
-
 });
-
+//////////////////
+var geoserverUrl = 'http://localhost:8080/geoserver/wms';
 // Layers
-// Aerial
+// AERIAL
 var ortho = new ol.source.TileWMS({
     url:'http://geoservices.informatievlaanderen.be/raadpleegdiensten/omwrgbmrvl/wms',
     params: {
@@ -140,7 +152,7 @@ var orthoWms = new ol.layer.Tile({
 });
 // GRB
 var grb = new ol.source.TileWMS({
-    url:'http://localhost:8080/geoserver/wms',
+    url: geoserverUrl,
     params: {'LAYERS': 'myspot:grb',
         'FORMAT': 'image/png'},
     serverType: 'geoserver'
@@ -150,7 +162,7 @@ var grbWms = new ol.layer.Tile({
 });
 // INFO
 var info = new ol.source.ImageWMS({
-    url:'http://localhost:8080/geoserver/wms',
+    url:geoserverUrl,
     params: {'LAYERS': 'myspot:info',
         'FORMAT': 'image/png'},
     serverType: 'geoserver'
@@ -158,10 +170,9 @@ var info = new ol.source.ImageWMS({
 var infoWms = new ol.layer.Image({
     source:info
 });
-
 //  PARKINGAREAL
 var parkingareal = new ol.source.ImageWMS({
-    url:'http://localhost:8080/geoserver/wms',
+    url:geoserverUrl,
     params: {'LAYERS': 'myspot:parkingareal',
         'FORMAT': 'image/png'},
     serverType: 'geoserver'
@@ -169,10 +180,9 @@ var parkingareal = new ol.source.ImageWMS({
 var parkingarealWms = new ol.layer.Image({
     source:parkingareal
 });
-
 // INHABITANTS
 var inhabitants = new ol.source.ImageWMS({
-    url:'http://localhost:8080/geoserver/wms',
+    url:geoserverUrl,
     params: {'LAYERS': 'myspot:inhabitants',
         'FORMAT' : 'image/png'},
     serverType: 'geoserver'
@@ -182,7 +192,7 @@ var inhabtitantsWms = new ol.layer.Image({
 });
 // CIRCULATION
 var circulation = new ol.source.TileWMS({
-    url:'http://localhost:8080/geoserver/wms',
+    url:geoserverUrl,
     params: {'LAYERS': 'myspot:circulationplan',
         'FORMAT' : 'image/png'},
     serverType: 'geoserver'
@@ -192,7 +202,7 @@ var circulationWms = new ol.layer.Tile({
 });
 // PARKING AREAS
 var parkingareas = new ol.source.TileWMS({
-    url:'http://localhost:8080/geoserver/wms',
+    url:geoserverUrl,
     params: {'LAYERS': 'myspot:parkingareas',
         'FORMAT' : 'image/png'},
     serverType: 'geoserver'
@@ -200,9 +210,39 @@ var parkingareas = new ol.source.TileWMS({
 var parkingareasWms = new ol.layer.Tile({
     source: parkingareas
 });
+// PUBLIC TRANSPORT LINES ALL
+var ptLines = new ol.source.TileWMS({
+    url:geoserverUrl,
+    params: {'LAYERS': 'myspot:publictransportlines',
+        'FORMAT' : 'image/png'},
+    serverType: 'geoserver'
+});
+var ptLinesWms = new ol.layer.Tile({
+    source: ptLines
+});
+// PUBLIC TRANSPORT LINES SINGLE
+var ptLinesSingle = new ol.source.TileWMS({
+    url:geoserverUrl,
+    params: {'LAYERS': 'myspot:publictransportlinessingle',
+        'FORMAT' : 'image/png'},
+    serverType: 'geoserver'
+});
+var ptLinesSingleWms = new ol.layer.Tile({
+    source: ptLinesSingle
+});
+// PUBLIC TRANSPORT STOPS
+var ptStops = new ol.source.ImageWMS({
+    url:geoserverUrl,
+    params: {'LAYERS': 'myspot:publictransportstops',
+        'FORMAT' : 'image/png'},
+    serverType: 'geoserver'
+});
+var ptStopsWms = new ol.layer.Image({
+    source: ptStops
+});
 // TAXI
 var taxi = new ol.source.ImageWMS({
-    url:'http://localhost:8080/geoserver/wms',
+    url:geoserverUrl,
     params: {'LAYERS': 'myspot:taxi',
         'FORMAT' : 'image/png'},
     serverType: 'geoserver'
@@ -212,7 +252,7 @@ var taxiWms = new ol.layer.Image({
 });
 // CAMBIO
 var cambio = new ol.source.ImageWMS({
-    url:'http://localhost:8080/geoserver/wms',
+    url:geoserverUrl,
     params: {'LAYERS': 'myspot:cambio',
         'FORMAT' : 'image/png'},
     serverType: 'geoserver'
@@ -222,7 +262,7 @@ var cambioWms = new ol.layer.Image({
 });
 // BLUEBIKE
 var bluebike = new ol.source.ImageWMS({
-    url:'http://localhost:8080/geoserver/wms',
+    url:geoserverUrl,
     params: {'LAYERS': 'myspot:bluebike',
         'FORMAT' : 'image/png'},
     serverType: 'geoserver'
@@ -232,7 +272,7 @@ var bluebikeWms = new ol.layer.Image({
 });
 // STATIONS
 var stations = new ol.source.ImageWMS({
-    url:'http://localhost:8080/geoserver/wms',
+    url:geoserverUrl,
     params: {'LAYERS': 'myspot:stations',
         'FORMAT' : 'image/png'},
     serverType: 'geoserver'
@@ -242,7 +282,7 @@ var stationsWms = new ol.layer.Image({
 });
 // PARKINGGARAGES
 var garages = new ol.source.ImageWMS({
-    url:'http://localhost:8080/geoserver/wms',
+    url:geoserverUrl,
     params: {'LAYERS': 'myspot:parkinggarages',
         'FORMAT' : 'image/png'},
     serverType: 'geoserver'
@@ -252,7 +292,7 @@ var garagesWms = new ol.layer.Image({
 });
 // P+R
 var pr = new ol.source.ImageWMS({
-    url:'http://localhost:8080/geoserver/wms',
+    url:geoserverUrl,
     params: {'LAYERS': 'myspot:pr',
         'FORMAT' : 'image/png'},
     serverType: 'geoserver'
@@ -260,8 +300,7 @@ var pr = new ol.source.ImageWMS({
 var prWms = new ol.layer.Image({
     source:pr
 });
-
-
+//////////////////
 // Pop-up
 // * Elements that make up the popup.
 var container = document.getElementById('popup');
@@ -281,9 +320,9 @@ closer.onclick = function() {
     closer.blur();
     return false;
 };
-
+//////////////////////////////////////////////////////////////////
 /* Create MAP function*/
-$ (function() {
+function mapFunction(){
     // create projection
     var lb72 = new ol.proj.Projection({
         code: 'EPSG:31370',
@@ -296,27 +335,25 @@ $ (function() {
     var view = new ol.View({
         projection: lb72,
         zoom: 6,
-        minZoom: 2,
         center: [104769, 193932],
         extent: [86332, 174808, 125083, 212935]
     });
 
     // Array of layers
-    var layers = [orthoWms, grbWms, infoWms, inhabtitantsWms, circulationWms, parkingareasWms, taxiWms, cambioWms,
-        bluebikeWms, stationsWms, garagesWms, prWms];
+    var layersWms = [orthoWms, grbWms, infoWms, inhabtitantsWms, circulationWms, parkingareasWms,
+                ptLinesWms, ptLinesSingleWms, ptStopsWms, taxiWms, cambioWms,
+                bluebikeWms, stationsWms, garagesWms, prWms];
 
     // Create Map
     var map = new ol.Map({
-        layers: layers,
+        layers: layersWms,
         overlays : [overlay],
         target: 'map',
-        view: view
+        view: view,
+        controls: [] //removes the default controls
     });
-
-    // Buttons
-    // URLS
+    //////////////////
     const urlLocation = "http://loc.geopunt.be/geolocation/location";
-
     // Function that retrieves info from the CRAB API
     function crabAPI(url, parameters, callback, origin){
         $.getJSON({
@@ -324,7 +361,7 @@ $ (function() {
                 data: parameters,
                 dataType: 'jsonp'
             },
-            // Anonieme functie die de resultaten doorstuurt naar de "callback" functie
+            // Anonymous function that forwards the results to the callback function
             function (jsonresults) {
                 callback(jsonresults, origin);
             });
@@ -351,12 +388,12 @@ $ (function() {
             setToMarker(coordinates);
         }
     }
-    /* retrieve text from clicked li in FROM (suggestionlist),
+    //////////////////
+    /* retrieve text from clicked li in FROM/TO (suggestionlist),
      Delete list items and place marker
      */
     $("#autocompleteFrom").on("click", "li", function () {
         var text = $(this).text();
-        console.log(text);
         $(this).closest("ul").prev("div").find("input").val(text);
         $(this).siblings().addBack().addClass("ui-screen-hidden");
 
@@ -373,7 +410,6 @@ $ (function() {
      */
     $("#autocompleteTo").on("click", "li", function () {
         var text = $(this).text();
-        // console.log(text);
         $(this).closest("ul").prev("div").find("input").val(text);
         $(this).siblings().addBack().addClass("ui-screen-hidden");
 
@@ -385,7 +421,7 @@ $ (function() {
 
         crabAPI(urlLocation, parameters, getLocationFromAddress, 'to');
     });
-
+    //////////////////
     // From Map Location
     var btnFromMapLocation = document.getElementById("btnFromMapLocation");
     btnFromMapLocation.addEventListener('click', function fromMapLocation(){
@@ -436,11 +472,13 @@ $ (function() {
             }
         });
     } );
+    //////////////////
     var positionFromFeature = new ol.Feature();
     positionFromFeature.setStyle(new ol.style.Style({
         image: new ol.style.Icon({
             src: "resources/css/images/myspot_icons/flag-map-marker2.svg",
             anchorOrigin: "bottom-right",
+            anchor: [0.7,0.2],
             scale: 0.05
         })
     }));
@@ -449,6 +487,7 @@ $ (function() {
         image: new ol.style.Icon({
             src: "resources/css/images/myspot_icons/flag-map-marker2.svg",
             anchorOrigin: "bottom-right",
+            anchor: [0.7,0.2],
             scale: 0.05
         })
     }));
@@ -483,8 +522,12 @@ $ (function() {
         $("#autocompleteTo").data('coordinates', position);
         checkMarker('to');
     }
-
+    //////////////////
     // NAVIGATION FUNCTIONS
+    var navigateBtn = document.getElementById("btnNavigation");
+    navigateBtn.addEventListener('click', handleGetPosition, false);
+    navigateBtn.addEventListener('touchstart', handleGetPosition, false);
+
     var navigationMarker;
     var fromMarker;
     var toMarker;
@@ -549,11 +592,7 @@ $ (function() {
 
         map.addLayer(navigationMarker);
     }
-    var navigateBtn = document.getElementById("btnNavigation");
-    navigateBtn.addEventListener('click', handleGetPosition, false);
-    navigateBtn.addEventListener('touchstart', handleGetPosition, false);
-
-
+    //////////////////
     // CURRENT LOCATIONS
     var btnFromCurrentLocation = document.getElementById("btnFromCurrentLocation");
     btnFromCurrentLocation.addEventListener('click', function fromCurrentLocation(){
@@ -577,8 +616,6 @@ $ (function() {
 
                 crabAPI(urlLocation, parameters, formatAddressFromLocation, 'from');
                 setFromMarker(position);
-
-                // this.setTracking(false);
             });
     });
     var btnToCurrentLocation = document.getElementById("btnToCurrentLocation");
@@ -603,43 +640,14 @@ $ (function() {
 
                 crabAPI(urlLocation, parameters, formatAddressFromLocation, 'to');
                 setToMarker(position);
-
-                // this.setTracking(false);
             });
     });
-
+    //////////////////////////////////////////////////////////////////
     // WMS getfeatureInfo
     var viewProjection = view.getProjection();
     var viewResolution = view.getResolution();
     var parkingRTList = ['Sint-Michiels', 'Sint-Pietersplein', 'Vrijdagmarkt', 'Savaanstraat', 'Ramen', 'Reep'];
     const url_parkings_online = "http://datatank.stad.gent/4/mobiliteit/bezettingparkingsrealtime.json";
-
-    // Get Real-time Parking Info
-    function getParkingRTInfo(url, parameters, success, name){
-        $.getJSON({
-                url: url,
-                data: parameters,
-                dataType: 'json'
-            },
-            function(jsonresults){
-                success(jsonresults, name);
-            });
-    }
-    // Parse parkinggarage result to acquire wanted garage data
-    function parseParking(results, name){
-        // console.log(results);
-        for(var i = 0; i < results.length; i++){
-            if(results[i].description === name){
-                var capacityRT = results[i].parkingStatus.availableCapacity;
-                // console.log(capacityRT);
-                // Append the result to the pop-up
-                content.appendChild(document.createElement('br'));
-                content.appendChild(document.createElement('br'));
-                content.appendChild(document.createTextNode('Current available parking spots: '));
-                content.appendChild(document.createTextNode(capacityRT));
-            }
-        }
-    }
 
     map.on('click', function(evt) {
         // ParkingGarage
@@ -650,7 +658,6 @@ $ (function() {
                     'INFO_FORMAT': 'text/javascript'
                 });
             if (urlGarage) {
-                // console.log("Garage:" + urlGarage);
                 $.ajax({
                     url: urlGarage,
                     dataType: 'jsonp',
@@ -687,7 +694,31 @@ $ (function() {
             infoPr(evt);
         }
     });
-
+    // Get Real-time Parking Info
+    function getParkingRTInfo(url, parameters, success, name){
+        $.getJSON({
+                url: url,
+                data: parameters,
+                dataType: 'json'
+            },
+            function(jsonresults){
+                success(jsonresults, name);
+            });
+    }
+    // Parse parkinggarage result to acquire wanted garage data
+    function parseParking(results, name){
+        for(var i = 0; i < results.length; i++){
+            if(results[i].description === name){
+                var capacityRT = results[i].parkingStatus.availableCapacity;
+                // Append the result to the pop-up
+                content.appendChild(document.createElement('br'));
+                content.appendChild(document.createElement('br'));
+                content.appendChild(document.createTextNode('Current available parking spots: '));
+                content.appendChild(document.createTextNode(capacityRT));
+            }
+        }
+    }
+    //////////////////
     function infoPr(evt) {
         if (prWms.getVisible()){
             var urlPR = prWms.getSource().getGetFeatureInfoUrl(
@@ -696,7 +727,6 @@ $ (function() {
                     'INFO_FORMAT': 'text/javascript'
                 });
             if (urlPR) {
-                // console.log("Parking:" + urlPR);
                 $.ajax({
                     url: urlPR,
                     dataType: 'jsonp',
@@ -704,8 +734,6 @@ $ (function() {
                 }).then(function(response) {
                     var parser = new ol.format.GeoJSON();
                     var results = parser.readFeatures(response);
-                    //console.log(response);
-                    // console.log(results);
                     if (results.length) {
                         var info =[];
                         for (var i = 0, ii = results.length; i < ii; ++i) {
@@ -730,7 +758,7 @@ $ (function() {
             infoParkingAreas(evt);
         }
     }
-
+    //////////////////
     function infoParkingAreas(evt) {
         if (parkingareasWms.getVisible()){
             var urlParkingAreas = parkingareasWms.getSource().getGetFeatureInfoUrl(
@@ -739,7 +767,6 @@ $ (function() {
                     'INFO_FORMAT': 'text/javascript'
                 });
             if (urlParkingAreas) {
-                // console.log(urlParkingAreas);
                 $.ajax({
                     url: urlParkingAreas,
                     dataType: 'jsonp',
@@ -747,8 +774,6 @@ $ (function() {
                 }).then(function(response) {
                     var parser = new ol.format.GeoJSON();
                     var results = parser.readFeatures(response);
-                    // console.log(response);
-                    // console.log(results);
                     if (results.length) {
                         var info =[];
                         for (var i = 0, ii = results.length; i < ii; ++i) {
@@ -772,6 +797,7 @@ $ (function() {
             infoCirculationAreas(evt);
         }
     }
+    //////////////////
     function infoCirculationAreas(evt) {
         if (circulationWms.getVisible()){
             var urlCirculationAreas = circulationWms.getSource().getGetFeatureInfoUrl(
@@ -780,7 +806,6 @@ $ (function() {
                     'INFO_FORMAT': 'text/javascript'
                 });
             if (urlCirculationAreas) {
-                // console.log(urlCirculationAreas);
                 $.ajax({
                     url: urlCirculationAreas,
                     dataType: 'jsonp',
@@ -788,8 +813,6 @@ $ (function() {
                 }).then(function(response) {
                     var parser = new ol.format.GeoJSON();
                     var results = parser.readFeatures(response);
-                    // console.log(response);
-                    // console.log(results);
                     if (results.length) {
                         var info =[];
                         for (var i = 0, ii = results.length; i < ii; ++i) {
@@ -811,16 +834,15 @@ $ (function() {
             infoParkingAeral(evt);
         }
     }
-
+    //////////////////
     function infoParkingAeral(evt) {
-        if (grbWms.getVisible()){
+        if (infoWms.getVisible()){
             var urlInfoParkingAreas = parkingarealWms.getSource().getGetFeatureInfoUrl(
                 evt.coordinate, view.getResolution(), viewProjection,
                 {
                     'INFO_FORMAT': 'text/javascript'
                 });
             if (urlInfoParkingAreas) {
-                // console.log(urlInfoParkingAreas);
                 $.ajax({
                     url: urlInfoParkingAreas,
                     dataType: 'jsonp',
@@ -829,12 +851,9 @@ $ (function() {
                     var parser = new ol.format.GeoJSON();
                     var results = parser.readFeatures(response);
                     var zone;
-                    //console.log(response);
-                    //console.log(results);
                     if (results.length) {
                         var info =[];
                         for (var i = 0, ii = results.length; i < ii; ++i) {
-
                             if(results[i].get('pregime') === '0'){
                                 zone = 'Blauwe tariezone';
                             } else if (results[i].get('pregime') === '1'){
@@ -874,7 +893,7 @@ $ (function() {
             }
         }
     }
-
+    //////////////////////////////////////////////////////////////////
     // Check From and to input
     function checkMarker(origin){
         var coordinates;
@@ -910,7 +929,7 @@ $ (function() {
             }
         }
     }
-
+    //////////////////
     // Clear error input and possible markers
     function clearLocationMarker(origin){
         if (origin === 'from'){
@@ -929,44 +948,86 @@ $ (function() {
             }
         }
     }
-
-    // check date and time input
-    function checkTime(time){
-        if (time === ''){
-            alert('No time of departure was given!');
-            document.getElementById('time-input').focus();
+    function checkDateTime (date, time){
+        // create dateNow
+        var dateNow = new Date();
+        // create chosen date from input
+        var dateUserList  = date.split('-');
+        var timeUserList = time.split(':');
+        var dateUser = new Date(dateUserList[0], (dateUserList[1]-1), dateUserList[2], timeUserList[0], timeUserList[1], 59);
+        // Check if chosen dateTime is before current dateTime
+        if (dateUser < dateNow || date === '' || time === ''){
+            var dateNowFormat1 = [dateNow.getFullYear(), (dateNow.getMonth()+1), dateNow.getDate(), dateNow.getHours(), dateNow.getMinutes()];
+            var dateNowFormat2 = [];
+            for (var i = 0; i < dateNowFormat1.length; i++){
+                if (dateNowFormat1[i].toString().length === 1){
+                    dateNowFormat2.push('0' + (dateNowFormat1[i].toString()));
+                } else {
+                    dateNowFormat2.push(dateNowFormat1[i].toString());
+                }
+            }
+            var dateNowFinal = dateNowFormat2[0] + '-' + dateNowFormat2[1] + '-' + dateNowFormat2[2];
+            var timeNowFinal = dateNowFormat2[3] + ':' + dateNowFormat2[4];
+            // set dateTime now in user input
+            document.getElementById("date-input").value = dateNowFinal;
+            document.getElementById("time-input").value = timeNowFinal;
+            // let user know the dateTime has been altered automatically
+            alert('The date and time has been set to current');
+            // return list of dateTime now
+            return [dateNowFinal, timeNowFinal];
         } else {
-            return(true);
+            // return list of dateTime chosen
+            return [date, time];
         }
     }
-    function checkDate(date){
-        if (date === ''){
-            alert('No date of departure was given!');
-            document.getElementById('date-input').focus();
-        } else {
-            return(true);
-        }
+    // Error with routing
+    function routingError(info){
+        alert('Error with: ' + info);
+        clearRoutingLayers();
+        document.getElementById('routingLayersCollapse').className = "layerType animateMe ui-disabled";
+        document.getElementById('routingInfoCollapseHeader').className = "routingInfoCollapsible ui-disabled";
+        $.loader('close');
     }
 
-    ////// Calculate and Reset Button
+    function clearRoutingLayers(){
+        for(var i = 0; i < vectorLayers.length; i++) {
+            map.getLayers().forEach(function (el) {
+                if (vectorLayers.indexOf(el.get('name')) >= 0) {
+                    map.removeLayer(el);
+                }
+            })
+        }
+    }
+    //////////////////
+    var vectorLayers = [
+        'parkingGarageCar','parkingGarageWalkBike','prCar','prWalkBike','carGarageLabel','carGarageCircle','walkGarageLabel','walkGarageCircle','bikeGarageLabel','bikeGarageCircle'
+        ,'carPrLabel','carPrCircle','walkPrLabel','walkPrCircle','bikePrLabel','bikePrCircle','ptPrBus','ptPrBusLabel','ptPrBusLabelCircle','ptPrTram','ptPrTramLabel','ptPrTramLabelCircle'
+        ,'ptPrWalk','ptPrWalkLabel','ptPrWalkLabelCircle','ptGarageBus','ptGarageBusLabel','ptGarageBusLabelCircle','ptGarageTram','ptGarageTramLabel','ptGarageTramLabelCircle'
+        ,'ptGarageWalk','ptGarageWalkLabel','ptGarageWalkLabelCircle'
+    ];
+    var vectorLayersPr = [
+        'prCar','prWalkBike','carPrLabel','carPrCircle','walkPrLabel','walkPrCircle','bikePrLabel','bikePrCircle','ptPrBus','ptPrBusLabel'
+        ,'ptPrBusLabelCircle','ptPrTram','ptPrTramLabel','ptPrTramLabelCircle','ptPrWalk','ptPrWalkLabel','ptPrWalkLabelCircle'
+    ];
+    var vectorLayersGarage = [
+        ,'parkingGarageCar','parkingGarageWalkBike','carGarageLabel','carGarageCircle','walkGarageLabel','walkGarageCircle','bikeGarageLabel'
+        ,'bikeGarageCircle','ptGarageBus','ptGarageBusLabel','ptGarageBusLabelCircle','ptGarageTram','ptGarageTramLabel','ptGarageTramLabelCircle'
+        ,'ptGarageWalk','ptGarageWalkLabel','ptGarageWalkLabelCircle'
+    ];
+    //////////////////////////////////////////////////////////////////
     var btnRoute = document.getElementById("btnRoute");
     btnRoute.addEventListener('click', function btnRoute(){
+        // Clear the main routing object
+        routeInput = '';
+        // Collapse and disable routing info and layer
         $('#routingInfoCollapseHeader').collapsible("collapse");
         document.getElementById('routingLayersCollapse').className = "layerType animateMe ui-disabled";
         document.getElementById('routingInfoCollapseHeader').className = "routingInfoCollapsible ui-disabled";
-        // enable routing Info collapsible and Routing Layer checkboxes
-        // Good? document.getElementById('routingInfoCollapseHeader').className = "routingInfoCollapsible ui-disabled";
-        // Good? document.getElementById('routingLayersCollapseHeader').className = "ui-collaspible-set ui-disabled";
-        // collapse routing info
-        //
-        // collapse routing layers collapsible
-        // $('#routingLayersCollapse').collapsible("collapse");
         // Clear Routing Layers
         clearRoutingLayers();
         // Clear Public Transport Information
         document.getElementById('prPublicTransportInfo').innerHTML = "";
         document.getElementById('garagePublicTransportInfo').innerHTML = "";
-        // $('#InfoPtCollapsible').listview('refresh');
         // Get the input from the form
         var fromAddress = document.getElementById("filter-input-from").value;
         var fromCoordinates = $("#autocompleteFrom").data('coordinates');
@@ -987,9 +1048,11 @@ $ (function() {
         } else if (postTransportBus.checked){
             postTransport = 'bus'
         }
+        // Check and return dateTime (minimum to Now)
+        var dateTime = checkDateTime(date, time);
         // Check Input
-        if (checkMarker('from') && checkMarker('to') && checkTime(time) && checkDate(date)){
-            // console.log('good to send query!');
+        if (checkMarker('from') && checkMarker('to')){
+            // Create main routing object that will hold all the information
             routeInput = {
                 fromAddress : fromAddress,
                 fromLb72 : fromCoordinates,
@@ -997,24 +1060,25 @@ $ (function() {
                 toAddress : toAddress,
                 toLb72 : toCoordinates,
                 toWgs84 : ol.proj.transform(toCoordinates, lb72, 'EPSG:4326'),
-                date : date,
-                time : time,
-                dateTime : date + 'T' + time + ':59',
+                date : dateTime[0],
+                time : dateTime[1],
+                dateTime : dateTime[0] + 'T' + dateTime[1] + ':59',
                 duration : duration,
                 postTransport : postTransport
             };
+            // Call the main routing function
             routingMain();
-
         } else {
-            console.log('ERROR in input, not ready to send query!');
+            routingError("the input!");
         }
-
     });
-
+    //////////////////
     var btnReset = document.getElementById("btnReset");
     btnReset.addEventListener('click', function btnReset(){
-        // Collapse routing lists
-        collapseLists();
+        // Collapse and disable routing info and layer
+        $('#routingInfoCollapseHeader').collapsible("collapse");
+        document.getElementById('routingLayersCollapse').className = "layerType animateMe ui-disabled";
+        document.getElementById('routingInfoCollapseHeader').className = "routingInfoCollapsible ui-disabled";
         // Reset the values from the input form
         document.getElementById("filter-input-from").value = "";
         document.getElementById("filter-input-to").value = "";
@@ -1023,16 +1087,11 @@ $ (function() {
         $("#duration").val("4").selectmenu('refresh');
         $('#postWalk').prop('checked', true).checkboxradio('refresh');
         $('#postBike').prop('checked', false).checkboxradio('refresh');
+        $('#postBus').prop('checked', false).checkboxradio('refresh');
         $("#autocompleteFrom").data('coordinates', 0);
         $("#autocompleteTo").data('coordinates', 0);
+        // Clear the main routing object
         routeInput = '';
-        // Disable Navigation and clear marker
-        /*
-         if (map.getLayers(navigationMarker)){
-         geolocation.setTracking(false);
-         map.removeLayer(navigationMarker);
-         }
-         */
         // Clear Markers
         if (map.getLayers(fromMarker)){
             map.removeLayer(fromMarker);
@@ -1042,47 +1101,17 @@ $ (function() {
         }
         // Clear Routing layers
         clearRoutingLayers();
-
         // Clear Public Transport Information
         document.getElementById('prPublicTransportInfo').innerHTML = "";
         document.getElementById('garagePublicTransportInfo').innerHTML = "";
-
-        // disable routing Info collapsible
-        // Good? $('#routingInfoCollapseHeader').collapsible("collapse");
-        // disable routing layers collapsible
-        // document.getElementById('routingLayersCollapseHeader').setAttribute("data-collapsed","true");
-        // Good? $('#routingLayersCollapse').collapsible("collapse");
-        document.getElementById('routingLayersCollapse').className = "layerType animateMe ui-disabled";
-        document.getElementById('routingInfoCollapseHeader').className = "routingInfoCollapsible ui-disabled";
     });
-
-    function clearRoutingLayers(){
-        for(var i = 0; i < vectorLayers.length; i++) {
-            map.getLayers().forEach(function (el) {
-                if (vectorLayers.indexOf(el.get('name')) >= 0) {
-                    map.removeLayer(el);
-                }
-            })
-        }
-    }
-    var vectorLayers = [
-        'parkingGarageCar','parkingGarageWalkBike','prCar','prWalkBike','carGarageLabel','carGarageCircle','walkGarageLabel','walkGarageCircle','bikeGarageLabel','bikeGarageCircle'
-        ,'carPrLabel','carPrCircle','walkPrLabel','walkPrCircle','bikePrLabel','bikePrCircle','ptPrBus','ptPrBusLabel','ptPrBusLabelCircle','ptPrTram','ptPrTramLabel','ptPrTramLabelCircle'
-        ,'ptPrWalk','ptPrWalkLabel','ptPrWalkLabelCircle','ptGarageBus','ptGarageBusLabel','ptGarageBusLabelCircle','ptGarageTram','ptGarageTramLabel','ptGarageTramLabelCircle'
-        ,'ptGarageWalk','ptGarageWalkLabel','ptGarageWalkLabelCircle'
-    ];
-    var vectorLayersPr = [
-        'prCar','prWalkBike','carPrLabel','carPrCircle','walkPrLabel','walkPrCircle','bikePrLabel','bikePrCircle','ptPrBus','ptPrBusLabel'
-        ,'ptPrBusLabelCircle','ptPrTram','ptPrTramLabel','ptPrTramLabelCircle','ptPrWalk','ptPrWalkLabel','ptPrWalkLabelCircle'
-    ];
-    var vectorLayersGarage = [
-        ,'parkingGarageCar','parkingGarageWalkBike','carGarageLabel','carGarageCircle','walkGarageLabel','walkGarageCircle','bikeGarageLabel'
-        ,'bikeGarageCircle','ptGarageBus','ptGarageBusLabel','ptGarageBusLabelCircle','ptGarageTram','ptGarageTramLabel','ptGarageTramLabelCircle'
-        ,'ptGarageWalk','ptGarageWalkLabel','ptGarageWalkLabelCircle'
-    ];
-
-    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////START OF ROUTING
     function routingMain() {
+        // start loader
+        $.loader({
+            className:"mySpot",
+            content:'Rafa is calculating'
+        });
         if (routeInput.postTransport === 'bus') {
             prRoutePrep(function () {
                 routingTomTom(routeInput['fromWgs84'], routeInput['prWgs84'], 'prTo', routeInput['dateTime'], function () {
@@ -1161,10 +1190,10 @@ $ (function() {
             })
         }
     }
-
+    //////////////////////////////////////////////////////////////////This is the main routing object
     var routeInput;
+    //////////////////////////////////////////////////////////////////
     var wgs84Sphere = new ol.Sphere(6378137);
-
     // Calculate closest parking garage and append to routeInfo object
     function parkingGarageRoutePrep(callback) {
         var distanceParkingEnd = 9999999;
@@ -1236,11 +1265,11 @@ $ (function() {
 
         callback();
     }
-
+    //////////////////
     var tomTomData;
     function routingTomTom(fromLocal, toLocal, route, departure, callback){
         urlBase = 'https://api.tomtom.com/routing/1/calculateRoute/';
-        urlConstruct = urlBase + fromLocal[1] + ',' + fromLocal[0] + ':' + toLocal[1] + ',' + toLocal[0] + '/json?key=###ADDYOURKEYHERE###';
+        urlConstruct = urlBase + fromLocal[1] + ',' + fromLocal[0] + ':' + toLocal[1] + ',' + toLocal[0] + '/json?key=PLACEYOURKEYHERE';
         var travelMode;
         if (route.slice(-2) === 'To'){
             travelMode = 'car';
@@ -1256,16 +1285,20 @@ $ (function() {
             computeTravelTimeFor : 'all'
         };
 
-        $.getJSON({
-                url: urlConstruct,
-                data: parameters,
-                dataType: 'json'
-            },
-            function(jsonresults){
+        $.ajax({
+            type: 'GET',
+            url: urlConstruct,
+            data: parameters,
+            dataType: 'json',
+            success: function (jsonresults) {
                 tomTomData = jsonresults;
                 callback();
+            },
+            error: function () {
+                routingError('Routing');
             }
-        );
+
+        });
     }
 
     function parseTomTom(route, callback) {
@@ -1275,7 +1308,6 @@ $ (function() {
         var carPoints = {};
         var walkPoints = {};
         var bikePoints = {};
-        // console.log(results);
         var routeLocal = {
             summary : tomTomData.routes[0].summary
         };
@@ -1325,9 +1357,8 @@ $ (function() {
         }
         callback();
     }
-
+    //////////////////
     var deLijnData;
-
     // Public Transport Routing
     function routingDeLijn(from, start, callback){
         // http://docs.delijn.apiary.io/#reference/routeplanner/get?console=1
@@ -1358,19 +1389,21 @@ $ (function() {
             }
         }
         var urlBase = 'https://www.delijn.be/rise-api-core/reisadvies/routes/Gent/Gent/';
-        var urlEnd = '/1/on/on/of/of/of/eng';
+        var urlEnd = '/1/on/on/of/of/of/nl';
         var urlConstruct = urlBase + startX + '/' + startY + '/' + endX + '/' + endY + '/' + date + '/' + time + urlEnd;
-        // console.log(urlConstruct);
 
-        $.getJSON({
-                url: urlConstruct,
-                dataType: 'json'
-            },
-            function(jsonresults){
+        $.ajax({
+            type: 'GET',
+            url: urlConstruct,
+            dataType: 'json',
+            success: function(jsonresults){
                 deLijnData = jsonresults;
                 callback();
+            },
+            error: function() {
+                routingError('Public transport routing');
             }
-        );
+        });
     }
 
     // Parse jsonResults from deLijnRouting
@@ -1381,7 +1414,6 @@ $ (function() {
         var walkPoints = {};
         var busPoints = {};
         var tramPoints = {};
-        // var name = route + 'PublicTransport';
         var routeEndTime = 999999;
         var routeDuration;
         var routing;
@@ -1406,7 +1438,6 @@ $ (function() {
             var startPtSeconds = ((startPt.slice(0, 2)*(60*60)) + (startPt.slice(3, 5)*60));
             // If the route starts later than parkingEnd
             if (startPtSeconds > parkingEndSeconds){
-                // console.log(durationLocal);
                 // Calculate duration in seconds
                 var durationLocal = deLijnData.reiswegen[i].duration;
                 var durationRe = new RegExp('^([0-9]{1,2})u([0-9]{1,2})min$');
@@ -1456,9 +1487,9 @@ $ (function() {
                         polyline.push([coordinateX, coordinateY]);
                     }
                 }
-                // Get middle of linestring
+                // create linstring geometry
                 var geom = new ol.geom.LineString(polyline);
-                // console.log(geom);
+                // Get middle of linestring
                 var coordinateMiddleLinestring = geom.getCoordinateAt(0.5);
                 var point = new ol.geom.Point(coordinateMiddleLinestring);
 
@@ -1535,14 +1566,10 @@ $ (function() {
 
             callback();
         } else {
-            alert('No Route for Public Transport could be calculated');
-            clearRoutingLayers();
-            document.getElementById('routingLayersCollapse').className = "layerType animateMe ui-disabled";
-            document.getElementById('routingInfoCollapseHeader').className = "routingInfoCollapsible ui-disabled";
+            routingError('Public transport routing');
         }
-
     }
-
+    //////////////////
     // Draw the vector layers
     // LineLayers
     var parkingGarageCar;
@@ -1914,13 +1941,13 @@ $ (function() {
             }
         }
     }
+    //////////////////
     // Style of image labels
     var carGarageImage = new ol.style.Style({
         image: new ol.style.Icon({
             src: "resources/css/images/myspot_icons/car_garage.svg",
             anchorOrigin: "bottom-right",
             scale: 0.26
-            // opacity: 0.8
         })
     });
     var carPrImage = new ol.style.Style({
@@ -1928,7 +1955,6 @@ $ (function() {
             src: "resources/css/images/myspot_icons/car_pr.svg",
             anchorOrigin: "bottom-right",
             scale: 0.26
-            // opacity: 0.8
         })
     });
     var walkGarageImage = new ol.style.Style({
@@ -2074,7 +2100,7 @@ $ (function() {
             lineDash: [6]
         })
     });
-
+    //////////////////
     // Get P+R feature info for routing info
     function infoRoutingPr(callback) {
         var urlPR = prWms.getSource().getGetFeatureInfoUrl(
@@ -2083,7 +2109,6 @@ $ (function() {
                 'INFO_FORMAT': 'text/javascript'
             });
         if (urlPR) {
-            // console.log("Parking:" + urlPR);
             $.ajax({
                 url: urlPR,
                 dataType: 'jsonp',
@@ -2091,8 +2116,6 @@ $ (function() {
             }).then(function (response) {
                 var parser = new ol.format.GeoJSON();
                 var results = parser.readFeatures(response);
-                //console.log(response);
-                // console.log(results);
                 if (results.length) {
                     var info = [];
                     for (var i = 0, ii = results.length; i < ii; ++i) {
@@ -2104,7 +2127,6 @@ $ (function() {
                         routeInput['prAddress'] = results[i].get('address');
                     }
                     routeInput['prParkingInfo'] = info.join('<br>');
-                    //console.log(info);
                     callback();
                 }
             });
@@ -2118,7 +2140,6 @@ $ (function() {
                 'INFO_FORMAT': 'text/javascript'
             });
         if (urlGarage) {
-            // console.log("Garage:" + urlGarage);
             $.ajax({
                 url: urlGarage,
                 dataType: 'jsonp',
@@ -2145,11 +2166,9 @@ $ (function() {
             });
         }
     }
-
     // Get Real-time parking Garage info for routing info
     var parkingRt;
     function getParkingRTRoutingInfo(callback){
-        // console.log(routeInput.parkingGarage);
         if (parkingRTList.indexOf(routeInput.parkingGarage) >= 0) {
             $.getJSON({
                     url: url_parkings_online,
@@ -2157,7 +2176,6 @@ $ (function() {
                     dataType: 'json'
                 },
                 function (jsonresults) {
-                    //console.log(jsonresults);
                     parkingRt = jsonresults;
                     callback();
                 });
@@ -2167,12 +2185,16 @@ $ (function() {
     }
     // Parse parking garage RealTime result to acquire wanted garage data
     function parseRTParking(callback){
-        // console.log(results);
         if (parkingRt !== undefined){
             for(var i = 0; i < parkingRt.length; i++){
                 if(parkingRt[i].description === routeInput.parkingGarage){
-                    routeInput.parkingRt = 'Current available parking spots: ' + parkingRt[i].parkingStatus.availableCapacity;
-                    callback();
+                    if (parkingRt[i].parkingStatus.availableCapacity > 0){
+                        routeInput.parkingRt = 'Current available parking spots: ' + parkingRt[i].parkingStatus.availableCapacity;
+                        callback();
+                    } else {
+                        routeInput.parkingRt = 'Current available parking spots: Every parking spot is occupied!';
+                        callback();
+                    }
                 }
             }
         } else {
@@ -2180,6 +2202,7 @@ $ (function() {
             callback();
         }
     }
+    //////////////////
     var parkingRates = {
         rotation : {
             day : {
@@ -2288,10 +2311,6 @@ $ (function() {
         var nightTime;
         var dayTime;
 
-        //console.log( parkingStart + ' | ' + parkingStartSlice + ' | ' + parkingDuration + ' | ' + parkingEnd, ' | ' + day);
-        //console.log(parkingRate);
-        //console.log(rateNight);
-        // console.log(rateDay);
         if (parkingStartSlice >= 7 && parkingStartSlice <= 19 && parkingStartSlice !== 0){
             if (day === 'Sunday'){
                 // If day is sunday
@@ -2344,11 +2363,10 @@ $ (function() {
         }
 
         var costTotal = costNight + costDay;
-        routeInput.parkingCost = (Math.round(costTotal*Math.pow(10, 2))/Math.pow(10, 2));
+        routeInput.parkingCost = costTotal.toFixed(2);
         callback();
     }
-
-
+    //////////////////
     // Create objects from the html elements
     var prElements = {
         parkingInfo : document.getElementById('prParkingInfo'),
@@ -2420,9 +2438,9 @@ $ (function() {
         var timeFrom = new Date(null);
         timeFrom.setSeconds(durationFromParkingSeconds);
         var timeTotal = new Date(null);
+
         var durationTotal;
         // Endtime in seconds
-
         var endHour = endTime.slice(11, 13);
         var endMin = endTime.slice(14, 16);
         var endSec = endTime.slice(17, 19);
@@ -2431,13 +2449,11 @@ $ (function() {
         var startHour = startTime.slice(0, 2);
         var startMin = startTime.slice(3, 5);
         var startTotalSec = (parseInt(startHour * (60*60)) + parseInt(startMin *60));
-        var durationTotal;
         if (endTotalSec < startTotalSec){
             durationTotal = (parseInt(endTotalSec) + (24 * (60 * 60))) - parseInt(startTotalSec);
         } else {
             durationTotal = parseInt(endTotalSec) - parseInt(startTotalSec);
         }
-
         timeTotal.setSeconds(durationTotal);
 
         // Place content Parking Info
@@ -2481,8 +2497,6 @@ $ (function() {
             document.getElementById('walkImage2').style.visibility = 'hidden';
 
         }
-        // console.log(elements);
-        // console.log(routeInput);
         callback();
     }
     // Place Public transport info
@@ -2581,9 +2595,10 @@ $ (function() {
         }
         callback();
     }
+    //////////////////
     function routingVisible(){
         document.getElementById('routingInfoCollapseHeader').className = "routingInfoCollapsible";
-        document.getElementById('routingLayersCollapseHeader').className = "ui-collaspible-set";
+        document.getElementById('routingLayersCollapse').className = "layerType animateMe";
         // expand routing-info
         $('#routingInfoCollapseHeader').collapsible("expand");
 
@@ -2593,19 +2608,12 @@ $ (function() {
         } else {
             $('.publicTransportMainDiv').hide();
         }
+        // show the final routing object
         console.log(routeInput);
+        // close the loader
+        $.loader('close');
     }
-    // TESTING
-    function collapseLists(){
-        $('#prInfoCollapsible').trigger('collapse');
-        $('#routingInfoCollapseHeader').collapsible("collapse");
-        /*cannot call methods on collapsible prior to initialization
-        $('#routingLayersCollapseHeader').collapsible("collapse");
-        */
-        // $('#prInfoCollapsible animateMe').collapsible("collapse");
-        // data-collapsed="true"
-    }
-
+    ////////////////////////////////////////////////////////////////// END OF ROUTING
     // ROUTING LAYERS CHECKBOXES
     document.getElementById('routingPR').onclick = function(){
         if (this.checked) {
@@ -2637,14 +2645,15 @@ $ (function() {
             })
         }
     };
-});
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+}
+//////////////////////////////////////////////////////////////////
 // Set visibility of the layers off if desired at start-up
 inhabtitantsWms.setVisible(false);
 circulationWms.setVisible(false);
 parkingareasWms.setVisible(false);
+ptLinesWms.setVisible(false);
+ptLinesSingleWms.setVisible(false);
+ptStopsWms.setVisible(false);
 taxiWms.setVisible(false);
 cambioWms.setVisible(false);
 bluebikeWms.setVisible(false);
@@ -2700,6 +2709,44 @@ document.getElementById("taxi").onclick = function (){
         taxiWms.setVisible(false);
     }
 };
+// PT STOPS LAYER
+document.getElementById("ptStops").onclick = function (){
+    if (this.checked) {
+        ptStopsWms.setVisible(true);
+    } else {
+        ptStopsWms.setVisible(false);
+    }
+};
+// PT ALL LAYER
+document.getElementById("ptLinesAll").onclick = function (){
+    if (this.checked) {
+        ptLinesWms.setVisible(true);
+        ptLinesSingleWms.setVisible(false);
+        // change select box for single line to no lines selected
+        $('#ptSingle').val('empty').selectmenu('refresh');
+    } else {
+        ptLinesWms.setVisible(false);
+    }
+};
+// PT SINGLE LAYER
+$("#ptSingle").change(function(){
+    var line = $("#ptSingle").find(":selected").text();
+    if (line !== 'Choose line number'){
+        var lineNumber = line.slice(7, line.length);
+        var singleParam = 'lijn=' +"'" +  lineNumber + "'";
+        var params = {
+            'LAYERS': 'myspot:publictransportlinessingle',
+            'cql_filter': singleParam,
+            'FORMAT' : 'image/png'
+        };
+        ptLinesSingle.updateParams(params);
+        ptLinesSingle.refresh();
+        ptLinesSingleWms.setVisible(true);
+        // Hide pt lines all
+        ptLinesWms.setVisible(false);
+        $('#ptLinesAll').prop('checked', false).checkboxradio('refresh');
+    }
+});
 // PARKINGAREAS LAYER
 document.getElementById("parkingAreas").onclick = function (){
     if (this.checked) {
@@ -2749,9 +2796,9 @@ document.getElementById("info").onclick = function (){
 // MYSPOT LAYER
 document.getElementById("myspot").onclick = function (){
     if (this.checked) {
-        grbWms.setVisible(true);
-        infoWms.setVisible(true);
         $('#info').prop('checked', true).checkboxradio('refresh');
+        infoWms.setVisible(true);
+        grbWms.setVisible(true);
         orthoWms.setVisible(false);
     } else {
         grbWms.setVisible(false);
@@ -2760,38 +2807,28 @@ document.getElementById("myspot").onclick = function (){
 // ORTHO LAYER
 document.getElementById("ortho").onclick = function (){
     if (this.checked) {
-        grbWms.setVisible(false);
-        infoWms.setVisible(false);
         $('#info').prop('checked', false).checkboxradio('refresh');
+        infoWms.setVisible(false);
+        grbWms.setVisible(false);
         orthoWms.setVisible(true);
     } else {
         orthoWms.setVisible(false);
     }
 };
-
+//////////////////////////////////////////////////////////////////
 proj4.defs([
-// van https://epsg.io/3857
+// from https://epsg.io/3857
     [
         'EPSG:3857',
         '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs'],
     [
         'EPSG:4326',
         '+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees'],
-// van https://epsg.io/31370
+// from https://epsg.io/31370
     [
         'EPSG:31370',
         '+proj=lcc +lat_1=51.16666723333333 +lat_2=49.8333339 +lat_0=90 +lon_0=4.367486666666666 +x_0=150000.013 +y_0=5400088.438 +ellps=intl +towgs84=-106.869,52.2978,-103.724,0.3366,-0.457,1.8422,-1.2747 +units=m +no_defs'
     ]
 ]);
-
-/*
-TESTING
-$( ".InfoCollapsible" ).on( "collapsibleexpand", function( event, ui ) {
-    console.log(event);
-    console.log(ui);
-    $('.InfoPtCollapsible animateMe').trigger('collapse');
-} );
-*/
-
-
+//////////////////////////////////////////////////////////////////
 
