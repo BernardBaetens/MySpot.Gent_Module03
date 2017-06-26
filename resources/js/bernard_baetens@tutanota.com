@@ -524,10 +524,6 @@ function mapFunction(){
     }
     //////////////////
     // NAVIGATION FUNCTIONS
-    var navigateBtn = document.getElementById("btnNavigation");
-    navigateBtn.addEventListener('click', handleGetPosition, false);
-    navigateBtn.addEventListener('touchstart', handleGetPosition, false);
-
     var navigationMarker;
     var fromMarker;
     var toMarker;
@@ -592,6 +588,10 @@ function mapFunction(){
 
         map.addLayer(navigationMarker);
     }
+
+    var navigateBtn = document.getElementById("btnNavigation");
+    navigateBtn.addEventListener('click', handleGetPosition, false);
+    navigateBtn.addEventListener('touchstart', handleGetPosition, false);
     //////////////////
     // CURRENT LOCATIONS
     var btnFromCurrentLocation = document.getElementById("btnFromCurrentLocation");
@@ -613,9 +613,10 @@ function mapFunction(){
                     q : position[0] + ',' + position[1],
                     c : 1
                 };
-
                 crabAPI(urlLocation, parameters, formatAddressFromLocation, 'from');
                 setFromMarker(position);
+
+                this.setTracking(false);
             });
     });
     var btnToCurrentLocation = document.getElementById("btnToCurrentLocation");
@@ -637,9 +638,10 @@ function mapFunction(){
                     q : position[0] + ',' + position[1],
                     c : 1
                 };
-
                 crabAPI(urlLocation, parameters, formatAddressFromLocation, 'to');
                 setToMarker(position);
+
+                this.setTracking(false);
             });
     });
     //////////////////////////////////////////////////////////////////
@@ -1269,7 +1271,7 @@ function mapFunction(){
     var tomTomData;
     function routingTomTom(fromLocal, toLocal, route, departure, callback){
         urlBase = 'https://api.tomtom.com/routing/1/calculateRoute/';
-        urlConstruct = urlBase + fromLocal[1] + ',' + fromLocal[0] + ':' + toLocal[1] + ',' + toLocal[0] + '/json?key=PLACEYOURKEYHERE';
+        urlConstruct = urlBase + fromLocal[1] + ',' + fromLocal[0] + ':' + toLocal[1] + ',' + toLocal[0] + '/json?key=rsbP5avgB1MLJr6xjvtq5Vo6URcAAERS';
         var travelMode;
         if (route.slice(-2) === 'To'){
             travelMode = 'car';
